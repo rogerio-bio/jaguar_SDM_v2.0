@@ -56,19 +56,16 @@ write.csv(op@results[order(op@results$test_TSS), ], file = 'optimize_modelos_7.5
 #Extract best models (SDMmodel)
 
 #Best-TSS
-
 lq_0.6 <- op@models[[1]]
 lq_3.6_60 <- combineCV(lq_3.6_60)
 
 #Best LQ
-
-#model <- op@models[[5]]
+model <- op@models[[5]]
 model <- combineCV(model)
 
 #Best l
-
-#l_3.8_60 <- op@models[[74]]
-#l_3.8_60 <- combineCV(l_3.8_60)
+l_3.8_60 <- op@models[[74]]
+l_3.8_60 <- combineCV(l_3.8_60)
 
 
 #List models
@@ -77,5 +74,21 @@ models <- list (lq_3.6_60 = lq_3.6_60,
 
 #Automate analysis using Fangorn package
 
-#Using rivendell function to analysis all models at once
+#Using rivendell function to analysis all models at once - 100 models are analysed
 rivendell(op, test, predictors, jaguar, bg, "maxSSS", remove_prediction = TRUE , identifier = "20")
+
+#Making individual PA maps for selected models
+pa_lq_3.6_60 <- plotPA(p_lq_3.6_60, th = thresholds_result_lq_3.6_60[3, 2], filename = "lq_3.6_60_PA.tif")
+pa_model <- plotPA(p_model, th = thresholds_result_model[3, 2], filename = "model_60_PA.tif")
+
+#Calculation of several metrics proposed by Marcia-Barbosa et al., (2013) using Fangorn package
+#OPR, UPR, PPI and PAI
+
+lq_matrix <- confMatrix (lq_3.6_60, test= test, th = thresholds_result_lq_3.6_60 [3, 2], type = "cloglog")
+model_matrix <- confMatrix (model, test= test, th = thresholds_result_model[3, 2], type = "cloglog")
+l_matrix <- confMatrix (l_3.8_60, test= test, th = thresholds_result_l_3.8_60[3, 2], type = "cloglog")
+
+rohirrim(lq_matrix)
+rohirrim(model_matrix)
+rohirrim(l_matrix)
+
