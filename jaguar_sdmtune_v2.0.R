@@ -15,7 +15,7 @@ predictors = rast (predictor_filenames)
 
 plot(predictors)
 
-# Actual modelling #
+# Modelling #
 
 # Import species presence data
 jaguar <- read.csv(file.choose(), header = TRUE, sep = ",")
@@ -28,14 +28,13 @@ data <- prepareSWD(species = "Panthera onca", p = jaguar,
                    a = bg, env = predictors)
 
 
-# Split data in training, validation and testing datasets
+# Split data in training and testing datasets
 c(train, test) %<-% trainValTest(data,
                                     test = 0.3,
                                     only_presence = TRUE, 
                                     seed = 7)
 
-
-#Blocos espaciais
+#Spatial blocks - train data
 jaguar_folds <- get.block(occs = train@coords[train@pa == 1, ],
                           bg = train@coords[train@pa == 0, ],
                           orientation= "lat_lon")
@@ -56,11 +55,10 @@ write.csv(op@results[order(op@results$test_TSS), ], file = 'optimize_modelos_7.5
 
 #Extract best models (SDMmodel)
 
-#Best -TSS
+#Best-TSS
 
 lq_0.6 <- op@models[[1]]
 lq_3.6_60 <- combineCV(lq_3.6_60)
-
 
 #Best LQ
 
@@ -77,7 +75,7 @@ model <- combineCV(model)
 models <- list (lq_3.6_60 = lq_3.6_60,
                 model = model)
 
-#Automate analysis for the 3 bests models
-palantiris(op, test, predictors, jaguar, bg, "maxSSS", remove_prediction = TRUE , distance = "7.5")
+#Automate analysis using Fangorn package
 
+#Using rivendell function to analysis all models at once
 rivendell(op, test, predictors, jaguar, bg, "maxSSS", remove_prediction = TRUE , identifier = "20")
